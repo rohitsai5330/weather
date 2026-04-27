@@ -2,27 +2,48 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Live Weather</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Weather Dashboard</title>
+
 <link rel="stylesheet" href="style.css">
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
-<div class="container">
-    <h1 id="city">Detecting Location...</h1>
+<div class="box">
 
-    <div class="current">
-        <h2 id="temp">--°C</h2>
-        <p id="wind">Loading...</p>
-    </div>
+<div class="top">
 
-    <h3>Next Hours</h3>
-    <div id="hourly" class="row"></div>
+<div class="left">
+<div id="city">Detecting...</div>
+<h1><span id="temp">--</span>°C</h1>
+<div id="extra">Loading...</div>
+</div>
 
-    <h3>7 Day Forecast</h3>
-    <div id="daily" class="row"></div>
+<div class="right">
+<h2>Weather</h2>
+<div id="dayName"></div>
+<div id="summary"></div>
+</div>
+
+</div>
+
+<div class="tabs">
+<div class="tab active" onclick="switchTab('temp',this)">Temperature</div>
+<div class="tab" onclick="switchTab('rain',this)">Precipitation</div>
+<div class="tab" onclick="switchTab('wind',this)">Wind</div>
+</div>
+
+<div class="chart-area">
+<canvas id="chart"></canvas>
+</div>
+
+<div class="days" id="days"></div>
+
 </div>
 
 <script src="script.js"></script>
+
 </body>
 </html>

@@ -1,34 +1,68 @@
-<div class="top">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Live Weather</title>
 
-    <!-- Left Side -->
-    <div class="left">
+<link rel="stylesheet" href="style.css">
 
-        <!-- Weather Icon -->
-        <div class="weather-icon" id="mainIcon">☀️</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
 
-        <!-- Temperature + Stats -->
-        <div class="temp-wrap">
+<div class="box">
 
-            <div class="temp-line">
-                <span id="temp">37</span>
-                <span class="unit">°C | °F</span>
-            </div>
+    <!-- Top -->
+    <div class="top">
 
-            <div id="stats">
-                <div>Precipitation: 10%</div>
-                <div>Humidity: 26%</div>
-                <div>Wind: 13 km/h</div>
+        <div class="left">
+
+            <div class="weather-icon" id="mainIcon">☀️</div>
+
+            <div class="temp-wrap">
+
+                <div class="temp-line">
+                    <span id="temp">--</span>
+                    <span class="unit">°C | °F</span>
+                </div>
+
+                <div id="stats">
+                    <div id="rainVal">Precipitation: --%</div>
+                    <div id="humidVal">Humidity: --%</div>
+                    <div id="windVal">Wind: -- km/h</div>
+                </div>
+
             </div>
 
         </div>
 
+        <div class="right">
+            <h2>Weather</h2>
+            <div id="dayName">--</div>
+            <div id="summary">Loading...</div>
+            <div id="cityName"></div>
+        </div>
+
     </div>
 
-    <!-- Right Side -->
-    <div class="right">
-        <h2>Weather</h2>
-        <div id="dayName">Monday</div>
-        <div id="summary">Sunny</div>
+    <!-- Tabs -->
+    <div class="tabs">
+        <div class="tab active" onclick="switchTab('temp',this)">Temperature</div>
+        <div class="tab" onclick="switchTab('rain',this)">Precipitation</div>
+        <div class="tab" onclick="switchTab('wind',this)">Wind</div>
     </div>
+
+    <!-- Chart -->
+    <div class="chart-area">
+        <canvas id="chart"></canvas>
+    </div>
+
+    <!-- Days -->
+    <div class="days" id="daysRow"></div>
 
 </div>
+
+<script src="script.js"></script>
+</body>
+</html>

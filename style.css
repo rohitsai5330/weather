@@ -1,23 +1,26 @@
 .top{
-display:grid;
-grid-template-columns:1fr auto;
-align-items:start;
+display:flex;
+justify-content:space-between;
+align-items:flex-start;
 width:100%;
 margin-bottom:10px;
 }
 
+/* left side */
 .left{
 display:flex;
 align-items:flex-start;
-gap:14px;
+gap:12px;
 }
 
+/* icon */
 .weather-icon{
 font-size:52px;
 line-height:1;
 margin-top:2px;
 }
 
+/* temp + stats */
 .temp-wrap{
 display:flex;
 align-items:flex-start;
@@ -34,6 +37,7 @@ gap:4px;
 font-size:58px;
 font-weight:500;
 line-height:1;
+color:#202124;
 }
 
 .unit{
@@ -42,6 +46,7 @@ margin-top:8px;
 color:#3c4043;
 }
 
+/* right side stats */
 #stats{
 font-size:13px;
 line-height:1.35;
@@ -49,9 +54,10 @@ color:#5f6368;
 margin-top:2px;
 }
 
+/* weather title */
 .right{
 text-align:right;
-min-width:150px;
+min-width:160px;
 }
 
 .right h2{
@@ -59,15 +65,43 @@ font-size:20px;
 font-weight:500;
 margin:0;
 line-height:1.1;
+color:#202124;
 }
 
 #dayName{
 font-size:16px;
 margin-top:4px;
+color:#3c4043;
 }
 
 #summary{
 font-size:16px;
 color:#3c4043;
 margin-top:2px;
+}
+
+/* responsive */
+@media(max-width:768px){
+
+.top{
+flex-direction:column;
+gap:12px;
+}
+
+.right{
+text-align:left;
+}
+
+#temp{
+font-size:48px;
+}
+
+.weather-icon{
+font-size:42px;
+}
+
+.unit{
+font-size:20px;
+}
+
 }

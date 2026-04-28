@@ -4,7 +4,7 @@ let weatherData;
 /* Weather text */
 function weatherText(code){
 
-if(code==0) return "Sunny";
+if(code===0) return "Sunny";
 if(code<=3) return "Cloudy";
 if(code<=67) return "Rain";
 if(code<=99) return "Storm";
@@ -12,10 +12,10 @@ if(code<=99) return "Storm";
 return "Weather";
 }
 
-/* Weather icons */
+/* Weather icon */
 function weatherIcon(code){
 
-if(code==0) return "☀️";
+if(code===0) return "☀️";
 if(code<=3) return "☁️";
 if(code<=67) return "🌧️";
 if(code<=99) return "⛈️";
@@ -23,7 +23,7 @@ if(code<=99) return "⛈️";
 return "☁️";
 }
 
-/* Build graph */
+/* Build chart */
 function buildChart(type){
 
 const labels=[];
@@ -33,9 +33,9 @@ const nowHour=new Date().getHours();
 
 for(let i=nowHour;i<nowHour+8;i++){
 
-const h=i % 24;
+let hour=i % 24;
 
-labels.push(h + ":00");
+labels.push(hour + ":00");
 
 if(type==="temp"){
 values.push(weatherData.hourly.temperature_2m[i]);
@@ -51,7 +51,6 @@ values.push(weatherData.hourly.windspeed_10m[i]);
 
 }
 
-/* destroy old */
 if(weatherChart){
 weatherChart.destroy();
 }
@@ -69,14 +68,12 @@ color="#90a4ae";
 fill="rgba(144,164,174,.18)";
 }
 
-/* chart */
 weatherChart=new Chart(document.getElementById("chart"),{
 
 type:"line",
 
 data:{
 labels:labels,
-
 datasets:[{
 data:values,
 borderColor:color,
@@ -106,7 +103,7 @@ y:{display:false,grid:{display:false}}
 
 }
 
-/* tab click */
+/* Tab click */
 function switchTab(type,el){
 
 document.querySelectorAll(".tab").forEach(tab=>{
@@ -118,60 +115,59 @@ el.classList.add("active");
 buildChart(type);
 }
 
-/* Load weather by lat lon */
+/* Load weather */
 function loadWeather(lat,lon){
 
 fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&hourly=temperature_2m,precipitation_probability,windspeed_10m,relativehumidity_2m&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=auto`)
 
-.then(res=>res.json())
+.then(r=>r.json())
 
 .then(data=>{
 
 weatherData=data;
 
-const h=new Date().getHours();
+let h=new Date().getHours();
 
 /* top values */
-document.getElementById("temp").innerText=
+document.getElementById("temp").innerText =
 data.current_weather.temperature;
 
-document.getElementById("mainIcon").innerText=
+document.getElementById("mainIcon").innerText =
 weatherIcon(data.current_weather.weathercode);
 
-document.getElementById("summary").innerText=
+document.getElementById("summary").innerText =
 weatherText(data.current_weather.weathercode);
 
-document.getElementById("dayName").innerText=
+document.getElementById("dayName").innerText =
 new Date().toLocaleDateString("en-US",{weekday:"long"});
 
-/* stats */
-document.getElementById("rainVal").innerText=
+document.getElementById("rainVal").innerText =
 "Precipitation: " +
 data.hourly.precipitation_probability[h] + "%";
 
-document.getElementById("humidVal").innerText=
+document.getElementById("humidVal").innerText =
 "Humidity: " +
 data.hourly.relativehumidity_2m[h] + "%";
 
-document.getElementById("windVal").innerText=
+document.getElementById("windVal").innerText =
 "Wind: " +
 data.current_weather.windspeed + " km/h";
 
 /* default chart */
 buildChart("temp");
 
-/* forecast row */
+/* forecast cards */
 let html="";
 
 for(let i=0;i<7;i++){
 
-const date=new Date(data.daily.time[i]);
+let d=new Date(data.daily.time[i]);
 
-html+=`
+html += `
 <div class="day">
 
 <div class="dayname">
-${date.toLocaleDateString("en-US",{weekday:"short"})}
+${d.toLocaleDateString("en-US",{weekday:"short"})}
 </div>
 
 <div class="dayicon">
@@ -195,8 +191,80 @@ document.getElementById("daysRow").innerHTML=html;
 
 }
 
-/* Detect location */
+/* Reverse Geocode */
+function loadPlaceName(lat,lon){
+
+fetch(`https://geocode.maps.co/reverse?lat=${lat}&lon=${lon}`)
+
+.then(r=>r.json())
+
+.then(loc=>{
+
+const city =
+loc.address.city ||
+loc.address.town ||
+loc.address.village ||
+loc.address.state ||
+loc.address.country ||
+"Your Location";
+
+const country =
+loc.address.country || "";
+
+document.getElementById("topLocation").innerText =
+city + (country ? ", " + country : "");
+
+document.getElementById("cityName").innerText =
+city;
+
+})
+
+.catch(()=>{
+
+document.getElementById("topLocation").innerText =
+"Your Location";
+
+});
+
+}
+
+/* IP fallback */
+function loadByIP(){
+
+fetch("https://ipapi.co/json/")
+
+.then(r=>r.json())
+
+.then(data=>{
+
+document.getElementById("topLocation").innerText =
+data.city + ", " + data.country_name;
+
+document.getElementById("cityName").innerText =
+data.city;
+
+loadWeather(data.latitude,data.longitude);
+
+})
+
+.catch(()=>{
+
+document.getElementById("topLocation").innerText =
+"Bengaluru, India";
+
+document.getElementById("cityName").innerText =
+"Bengaluru";
+
+loadWeather(12.97,77.59);
+
+});
+
+}
+
+/* Main location detect */
 function refreshLocation(){
+
+if(navigator.geolocation){
 
 navigator.geolocation.getCurrentPosition(
 
@@ -205,50 +273,32 @@ navigator.geolocation.getCurrentPosition(
 const lat=position.coords.latitude;
 const lon=position.coords.longitude;
 
-/* weather */
 loadWeather(lat,lon);
-
-/* location name */
-fetch(`https://geocode.maps.co/reverse?lat=${lat}&lon=${lon}`)
-
-.then(r=>r.json())
-
-.then(loc=>{
-
-const city=
-loc.address.city ||
-loc.address.town ||
-loc.address.village ||
-loc.address.state ||
-loc.address.country ||
-"Your Location";
-
-const full=
-(city + ", " +
-(loc.address.country || "")).replace(", ","");
-
-document.getElementById("topLocation").innerText=full;
-document.getElementById("cityName").innerText=city;
-
-});
+loadPlaceName(lat,lon);
 
 },
 
-()=>{
+(error)=>{
 
-document.getElementById("topLocation").innerText=
-"Location blocked";
+loadByIP();
 
-document.getElementById("cityName").innerText=
-"Bengaluru";
+},
 
-loadWeather(12.97,77.59);
-
+{
+enableHighAccuracy:true,
+timeout:5000,
+maximumAge:0
 }
 
 );
 
+}else{
+
+loadByIP();
+
 }
 
-/* Auto load */
+}
+
+/* Start */
 refreshLocation();

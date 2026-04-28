@@ -1,183 +1,183 @@
-let fullData;
 let weatherChart;
+let weatherData;
 
-function textCode(code){
-
-if(code==0) return "Clear Sky";
-if(code<=3) return "Mostly Cloudy";
+function weatherText(code){
+if(code==0) return "Sunny";
+if(code<=3) return "Cloudy";
 if(code<=67) return "Rain";
 if(code<=99) return "Storm";
-
 return "Weather";
 }
 
-function iconCode(code){
-
+function weatherIcon(code){
 if(code==0) return "☀️";
-if(code<=3) return "⛅";
+if(code<=3) return "☁️";
 if(code<=67) return "🌧️";
 if(code<=99) return "⛈️";
-
 return "☁️";
 }
 
-function makeChart(type){
+/* Chart builder */
+function buildChart(type){
 
 const labels=[];
 const values=[];
 
-for(let i=0;i<8;i++){
+const nowHour=new Date().getHours();
 
-labels.push(fullData.hourly.time[i].split("T")[1]);
+for(let i=nowHour;i<nowHour+8;i++){
+
+let h=i % 24;
+labels.push(h + ":00");
 
 if(type==="temp"){
-values.push(fullData.hourly.temperature_2m[i]);
+values.push(weatherData.hourly.temperature_2m[i]);
 }
 
 if(type==="rain"){
-values.push(fullData.hourly.precipitation_probability[i]);
+values.push(weatherData.hourly.precipitation_probability[i]);
 }
 
 if(type==="wind"){
-values.push(fullData.hourly.windspeed_10m[i]);
+values.push(weatherData.hourly.windspeed_10m[i]);
 }
 }
 
-if(weatherChart){
-weatherChart.destroy();
-}
+if(weatherChart) weatherChart.destroy();
 
 let color="#f4b400";
+let fill="rgba(244,180,0,.18)";
 
-if(type==="rain") color="#4285f4";
-if(type==="wind") color="#90a4ae";
+if(type==="rain"){
+color="#4285f4";
+fill="rgba(66,133,244,.18)";
+}
+
+if(type==="wind"){
+color="#90a4ae";
+fill="rgba(144,164,174,.18)";
+}
 
 weatherChart=new Chart(document.getElementById("chart"),{
-
 type:"line",
-
 data:{
 labels:labels,
 datasets:[{
 data:values,
 borderColor:color,
-backgroundColor:"rgba(0,0,0,.03)",
-fill:false,
+backgroundColor:fill,
+fill:true,
 pointRadius:0,
 tension:.35,
-borderWidth:3
+borderWidth:2
 }]
 },
-
 options:{
 responsive:true,
 maintainAspectRatio:false,
-
-plugins:{
-legend:{display:false}
-},
-
+plugins:{legend:{display:false}},
 scales:{
-x:{
-grid:{display:false}
-},
-y:{
-display:false,
-grid:{display:false}
+x:{grid:{display:false}},
+y:{display:false,grid:{display:false}}
 }
 }
-}
-
 });
 }
 
+/* Click tabs */
 function switchTab(type,el){
 
-document.querySelectorAll(".tab").forEach(tab=>{
-tab.classList.remove("active");
+document.querySelectorAll(".tab").forEach(t=>{
+t.classList.remove("active");
 });
 
 el.classList.add("active");
 
-makeChart(type);
+buildChart(type);
 }
 
+/* Load weather */
 function loadWeather(lat,lon){
 
-const api=`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&hourly=temperature_2m,precipitation_probability,windspeed_10m&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=auto`;
-
-fetch(api)
-.then(response=>response.json())
+fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&hourly=temperature_2m,precipitation_probability,windspeed_10m,relativehumidity_2m&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=auto`)
+.then(r=>r.json())
 .then(data=>{
 
-fullData=data;
+weatherData=data;
+
+const h=new Date().getHours();
 
 document.getElementById("temp").innerText=data.current_weather.temperature;
+document.getElementById("mainIcon").innerText=weatherIcon(data.current_weather.weathercode);
 
-document.getElementById("extra").innerText=
-"Wind: "+data.current_weather.windspeed+" km/h";
-
-document.getElementById("summary").innerText=
-textCode(data.current_weather.weathercode);
+document.getElementById("summary").innerText=weatherText(data.current_weather.weathercode);
 
 document.getElementById("dayName").innerText=
 new Date().toLocaleDateString("en-US",{weekday:"long"});
 
-makeChart("temp");
+document.getElementById("rainVal").innerText=
+"Precipitation: "+data.hourly.precipitation_probability[h]+"%";
 
+document.getElementById("humidVal").innerText=
+"Humidity: "+data.hourly.relativehumidity_2m[h]+"%";
+
+document.getElementById("windVal").innerText=
+"Wind: "+data.current_weather.windspeed+" km/h";
+
+/* default tab */
+buildChart("temp");
+
+/* forecast cards */
 let html="";
 
-for(let i=0;i<7;i++){
+for(let i=0;i<8;i++){
 
 const d=new Date(data.daily.time[i]);
 
-const day=d.toLocaleDateString("en-US",{weekday:"short"});
-
 html+=`
 <div class="day">
-<div>${day}</div>
-<div class="dayicon">${iconCode(data.daily.weathercode[i])}</div>
-<div>
-<b>${Math.round(data.daily.temperature_2m_max[i])}°</b>
+<div class="dayname">${d.toLocaleDateString("en-US",{weekday:"short"})}</div>
+<div class="dayicon">${weatherIcon(data.daily.weathercode[i])}</div>
+<div class="daytemp">
+${Math.round(data.daily.temperature_2m_max[i])}°
 <span class="small">${Math.round(data.daily.temperature_2m_min[i])}°</span>
 </div>
-</div>
-`;
+</div>`;
 }
 
-document.getElementById("days").innerHTML=html;
+document.getElementById("daysRow").innerHTML=html;
 
 });
 }
 
-if(navigator.geolocation){
-
+/* Auto detect location */
 navigator.geolocation.getCurrentPosition(
 
-(position)=>{
-
-document.getElementById("city").innerText="Your Local Weather";
+(pos)=>{
 
 loadWeather(
-position.coords.latitude,
-position.coords.longitude
+pos.coords.latitude,
+pos.coords.longitude
 );
+
+fetch(`https://geocode.maps.co/reverse?lat=${pos.coords.latitude}&lon=${pos.coords.longitude}`)
+.then(r=>r.json())
+.then(loc=>{
+document.getElementById("cityName").innerText=
+loc.address.city ||
+loc.address.town ||
+loc.address.state ||
+"Your Location";
+});
 
 },
 
 ()=>{
 
-document.getElementById("city").innerText="Bengaluru, Karnataka";
+document.getElementById("cityName").innerText="Bengaluru";
 
 loadWeather(12.97,77.59);
 
 }
 
 );
-
-}else{
-
-document.getElementById("city").innerText="Bengaluru, Karnataka";
-
-loadWeather(12.97,77.59);
-}

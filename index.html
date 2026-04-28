@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Live Weather</title>
+<title>Live Weather Dashboard</title>
 
 <link rel="stylesheet" href="style.css">
 
@@ -13,7 +13,22 @@
 
 <div class="box">
 
-    <!-- Top -->
+    <!-- Top Location Bar -->
+    <div class="location-bar">
+
+        <div class="loc-left">
+            📍 <span id="topLocation">Detecting location...</span>
+        </div>
+
+        <div class="loc-right">
+            <button id="refreshLoc" onclick="refreshLocation()">
+                Use precise location
+            </button>
+        </div>
+
+    </div>
+
+    <!-- Main Top Weather -->
     <div class="top">
 
         <div class="left">
@@ -48,9 +63,17 @@
 
     <!-- Tabs -->
     <div class="tabs">
-        <div class="tab active" onclick="switchTab('temp',this)">Temperature</div>
-        <div class="tab" onclick="switchTab('rain',this)">Precipitation</div>
-        <div class="tab" onclick="switchTab('wind',this)">Wind</div>
+        <div class="tab active" onclick="switchTab('temp',this)">
+            Temperature
+        </div>
+
+        <div class="tab" onclick="switchTab('rain',this)">
+            Precipitation
+        </div>
+
+        <div class="tab" onclick="switchTab('wind',this)">
+            Wind
+        </div>
     </div>
 
     <!-- Chart -->
@@ -58,11 +81,19 @@
         <canvas id="chart"></canvas>
     </div>
 
-    <!-- Days -->
+    <!-- Forecast Days -->
     <div class="days" id="daysRow"></div>
+
+    <!-- Footer -->
+    <div class="footer-links">
+        <a href="#">Google Weather</a>
+        <span>•</span>
+        <a href="#">Feedback</a>
+    </div>
 
 </div>
 
 <script src="script.js"></script>
+
 </body>
 </html>

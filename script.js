@@ -6,6 +6,7 @@ if(code<=99) return "⛈️";
 return "☁️";
 }
 
+/* Load weather */
 function loadWeather(lat,lon){
 
 fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&hourly=precipitation_probability,relativehumidity_2m&timezone=auto`)
@@ -32,10 +33,16 @@ document.getElementById("wind").innerText =
 "Wind: " +
 Math.round(data.current_weather.windspeed) + " km/h";
 
+})
+.catch(()=>{
+
+document.getElementById("temp").innerText="--";
+
 });
 
 }
 
+/* Reverse geocode */
 function setPlace(lat,lon){
 
 fetch(`https://geocode.maps.co/reverse?lat=${lat}&lon=${lon}`)
@@ -47,18 +54,25 @@ d.address.city ||
 d.address.town ||
 d.address.village ||
 d.address.state ||
-d.address.country;
+d.address.country ||
+"Your Location";
 
 document.getElementById("loc").innerText = city;
 
 })
 .catch(()=>{
-document.getElementById("loc").innerText = "Your Location";
+
+useIP();
+
 });
 
 }
 
-function gps(){
+/* GPS */
+function useGPS(){
+
+document.getElementById("loc").innerText =
+"Finding your location...";
 
 navigator.geolocation.getCurrentPosition(
 
@@ -67,14 +81,17 @@ navigator.geolocation.getCurrentPosition(
 let lat=pos.coords.latitude;
 let lon=pos.coords.longitude;
 
-setPlace(lat,lon);
+document.getElementById("loc").innerText =
+"Loading weather...";
+
 loadWeather(lat,lon);
+setPlace(lat,lon);
 
 },
 
 ()=>{
 
-ip();
+useIP();
 
 },
 
@@ -87,11 +104,18 @@ timeout:5000
 
 }
 
-function ip(){
+/* Reliable IP fallback */
+function useIP(){
 
-fetch("https://ipapi.co/json/")
+fetch("https://ipwho.is/")
 .then(r=>r.json())
 .then(d=>{
+
+if(!d.success){
+
+useDefault();
+return;
+}
 
 document.getElementById("loc").innerText =
 d.city + ", " + d.region;
@@ -100,13 +124,30 @@ loadWeather(d.latitude,d.longitude);
 
 })
 .catch(()=>{
-document.getElementById("loc").innerText = "Location unavailable";
+
+useDefault();
+
 });
 
 }
 
+/* Final backup */
+function useDefault(){
+
+document.getElementById("loc").innerText =
+"Bengaluru, Karnataka";
+
+loadWeather(12.97,77.59);
+
+}
+
+/* Start */
 if(navigator.geolocation){
-gps();
+
+useGPS();
+
 }else{
-ip();
+
+useIP();
+
 }

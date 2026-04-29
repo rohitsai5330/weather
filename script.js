@@ -6,7 +6,7 @@ if(code<=99) return "⛈️";
 return "☁️";
 }
 
-/* Load weather */
+/* Weather */
 function loadWeather(lat,lon){
 
 fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&hourly=precipitation_probability,relativehumidity_2m&timezone=auto`)
@@ -35,14 +35,12 @@ Math.round(data.current_weather.windspeed) + " km/h";
 
 })
 .catch(()=>{
-
 document.getElementById("temp").innerText="--";
-
 });
 
 }
 
-/* Reverse geocode */
+/* Place name */
 function setPlace(lat,lon){
 
 fetch(`https://geocode.maps.co/reverse?lat=${lat}&lon=${lon}`)
@@ -61,9 +59,7 @@ document.getElementById("loc").innerText = city;
 
 })
 .catch(()=>{
-
 useIP();
-
 });
 
 }
@@ -90,9 +86,7 @@ setPlace(lat,lon);
 },
 
 ()=>{
-
 useIP();
-
 },
 
 {
@@ -104,7 +98,7 @@ timeout:5000
 
 }
 
-/* Reliable IP fallback */
+/* IP fallback */
 function useIP(){
 
 fetch("https://ipwho.is/")
@@ -112,7 +106,6 @@ fetch("https://ipwho.is/")
 .then(d=>{
 
 if(!d.success){
-
 useDefault();
 return;
 }
@@ -124,9 +117,7 @@ loadWeather(d.latitude,d.longitude);
 
 })
 .catch(()=>{
-
 useDefault();
-
 });
 
 }
@@ -143,11 +134,7 @@ loadWeather(12.97,77.59);
 
 /* Start */
 if(navigator.geolocation){
-
 useGPS();
-
 }else{
-
 useIP();
-
 }

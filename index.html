@@ -3,97 +3,37 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Live Weather Dashboard</title>
+<title>Live Weather</title>
 
 <link rel="stylesheet" href="style.css">
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
 <div class="box">
 
-    <!-- Top Location Bar -->
-    <div class="location-bar">
+<div class="location">
+📍 <span id="loc">Detecting...</span>
+</div>
 
-        <div class="loc-left">
-            📍 <span id="topLocation">Detecting location...</span>
-        </div>
+<div class="row">
 
-        <div class="loc-right">
-            <button id="refreshLoc" onclick="refreshLocation()">
-                Use precise location
-            </button>
-        </div>
+<div class="icon" id="icon">☁️</div>
 
-    </div>
+<div class="tempwrap">
+<div class="temp" id="temp">--</div>
+<div class="unit">°C | °F</div>
+</div>
 
-    <!-- Main Top Weather -->
-    <div class="top">
+<div class="stats">
+<div id="rain">Precipitation: --%</div>
+<div id="hum">Humidity: --%</div>
+<div id="wind">Wind: -- km/h</div>
+</div>
 
-        <div class="left">
-
-            <div class="weather-icon" id="mainIcon">☀️</div>
-
-            <div class="temp-wrap">
-
-                <div class="temp-line">
-                    <span id="temp">--</span>
-                    <span class="unit">°C | °F</span>
-                </div>
-
-                <div id="stats">
-                    <div id="rainVal">Precipitation: --%</div>
-                    <div id="humidVal">Humidity: --%</div>
-                    <div id="windVal">Wind: -- km/h</div>
-                </div>
-
-            </div>
-
-        </div>
-
-        <div class="right">
-            <h2>Weather</h2>
-            <div id="dayName">--</div>
-            <div id="summary">Loading...</div>
-            <div id="cityName"></div>
-        </div>
-
-    </div>
-
-    <!-- Tabs -->
-    <div class="tabs">
-        <div class="tab active" onclick="switchTab('temp',this)">
-            Temperature
-        </div>
-
-        <div class="tab" onclick="switchTab('rain',this)">
-            Precipitation
-        </div>
-
-        <div class="tab" onclick="switchTab('wind',this)">
-            Wind
-        </div>
-    </div>
-
-    <!-- Chart -->
-    <div class="chart-area">
-        <canvas id="chart"></canvas>
-    </div>
-
-    <!-- Forecast Days -->
-    <div class="days" id="daysRow"></div>
-
-    <!-- Footer -->
-    <div class="footer-links">
-        <a href="#">Google Weather</a>
-        <span>•</span>
-        <a href="#">Feedback</a>
-    </div>
+</div>
 
 </div>
 
 <script src="script.js"></script>
-
 </body>
 </html>
